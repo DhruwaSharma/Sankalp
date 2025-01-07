@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sankalp</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"
+  ></script>
+    <script type="text/javascript">
+        // Load Google Charts
+        google.charts.load("current", {
+          packages: ["corechart", "bar"],
+        });
+  
+        // Fetch data from Google Apps Script
+        async function fetchData() {
+          const sheetName = "Filtered Data"; // Fixed sheet name
+          const url = `https://script.google.com/macros/s/AKfycbzkdZAd74R1GkXnF--7aKJrreYinc4IGyXJlw4nrXYiFv3iK7PzKj107s1laOT3MpQUeg/exec?sheetName=${encodeURIComponent(
+            sheetName
+          )}`;
+          try {
+            const response = await fetch(url, { redirect: "follow" });
+            const result = await response.text();
+            return JSON.parse(result);
+          } catch (error) {
+            console.error("Error fetching data:", error);
+            return null;
+          }
+        }
+  
+        // Draw bar chart
+        function drawBarChart(chartData) {
+          // Extract data starting from E6:F9 (row index adjusted for JSON structure)
+          const filteredData = [["Name", "Total"]];
+          for (let i = 5; i <= 7; i++) {
+            filteredData.push([chartData[i][4], parseInt(chartData[i][5], 10)]);
+          }
+  
+          const data = google.visualization.arrayToDataTable(filteredData);
+  
+          const options = {
+            title: "Scores by Name",
+            hAxis: {
+              title: "Total",
+              minValue: 0,
+            },
+            vAxis: {
+              title: "Name",
+            },
+            bars: "horizontal", // Horizontal bars
+            colors: ["#4285F4"], // Set bar color
+          };
+  
+          const chart = new google.charts.Bar(
+            document.getElementById("barchart_div")
+          );
+          chart.draw(data, google.charts.Bar.convertOptions(options));
+        }
+  
+        // Initialize bar chart visualization
+        async function initialize() {
+          const sheetData = await fetchData();
+  
+          if (sheetData) {
+            drawBarChart(sheetData);
+          } else {
+            console.error("Failed to load chart data.");
+          }
+        }
+  
+        // Load charts after Google Charts is ready
+        google.charts.setOnLoadCallback(initialize);
+      </script>
+
+<script type="text/javascript">
+    google.charts.load("current", {
+      packages: ["corechart", "line"],
+    });
+
+    async function fetchData() {
+      const sheetName = "Filtered Data"; // Fixed sheet name
+      const url = `https://script.google.com/macros/s/AKfycbzkdZAd74R1GkXnF--7aKJrreYinc4IGyXJlw4nrXYiFv3iK7PzKj107s1laOT3MpQUeg/exec?sheetName=${encodeURIComponent(sheetName)}`;
+      try {
+        const response = await fetch(url, { redirect: "follow" });
+        const result = await response.text();
+        return JSON.parse(result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert("Failed to load chart data. Please try again later.");
+        return null;
+      }
+    }
+
+    function drawLineChart(chartData) {
+      if (!chartData || !Array.isArray(chartData)) {
+        console.error("Invalid data format.");
+        return;
+      }
+
+      // Extract and prepare data for the chart
+      const data = [["Date", "Abhinav", "Anku", "Dhruwa"]];
+      
+      for (let i = 14; i < 1000; i++) { // Loop from row 15 (index 14)
+        const row = chartData[i];
+        if (!row || row.length < 22) {
+          // Skip rows that do not have enough data
+          console.warn(`Skipping row ${i + 1} due to insufficient data.`);
+          continue;
+        }
+
+        const date = new Date(row[20]); // Date in column E
+        const abhinav = parseFloat(row[5]); // Number in column F
+        const anku = parseFloat(row[14]); // Number in column O
+        const dhruwa = parseFloat(row[21]); // Number in column V
+
+        // Ensure at least one of Abhinav, Anku, or Dhruwa has data
+        // If one of them is missing, set it as NaN so it won't appear in the chart
+        const abhinavValid = isNaN(abhinav) ? null : abhinav;
+        const ankuValid = isNaN(anku) ? null : anku;
+        const dhruwaValid = isNaN(dhruwa) ? null : dhruwa;
+
+        // If all values are invalid, skip this row
+        if (abhinavValid === null && ankuValid === null && dhruwaValid === null) {
+          console.warn(`Skipping row ${i + 1} due to all missing data.`);
+          continue;
+        }
+
+        // Add data row for the chart
+        data.push([date.toLocaleDateString(), abhinavValid, ankuValid, dhruwaValid]);
+      }
+
+      const chartDataTable = google.visualization.arrayToDataTable(data);
+
+      const options = {
+        title: "Scores Over Time",
+        curveType: "function", // Smooth curve for line chart
+        legend: { position: "bottom" },
+        hAxis: {
+          title: "Date",
+          format: "yyyy-MM-dd", // Format the date as year-month-day
+        },
+        vAxis: {
+          title: "Score",
+        },
+        colors: ["#4285F4", "#DB4437", "#0F9D58"], // Set line colors for each
+      };
+
+      const chart = new google.charts.Line(document.getElementById("linechart_div"));
+      chart.draw(chartDataTable, google.charts.Line.convertOptions(options));
+    }
+
+    async function initialize() {
+      const sheetData = await fetchData();
+      if (sheetData) {
+        drawLineChart(sheetData);
+      }
+    }
+
+    google.charts.setOnLoadCallback(initialize);
+  </script>
+
+      
+
+
+</head>
+<body>
+
+    <!--This is header section-->
+
+    <div class="header">
+
+        <div class="logo">
+
+            <a href="index.html">
+                <img src="Logo.png" alt="logo">
+            </a>
+
+        </div>
+
+        <div class="initials">
+
+            <h2>SANKALP</h2>
+
+            <p>Arise, Awake and Stop not until the Goal is Reached
+            </p>
+        </div>
+    </div>
+
+    <!--This is the main body-->
+
+    <div class="container">
+        <div class="hero">
+            <div class="comparitive">
+                <h3>Comparitive Score</h3> 
+                <div id="barchart_div" style="width: 320px; height: 200px;"></div>
+                <div id="linechart_div" style="width: 320px; height: 200px;"></div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
